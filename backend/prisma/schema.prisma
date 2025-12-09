@@ -71,6 +71,7 @@ model Review {
 
   user        User     @relation(fields: [user_id], references: [user_id])
   game        Game     @relation(fields: [game_id], references: [game_id])
+
   @@map("reviews")
 }
 
