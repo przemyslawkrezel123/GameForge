@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Shop {
+  shop_id   Int    @id @default(autoincrement())
+  name      String    @unique
+
+  games     Game[]
+  @@map("shops")
+}
+
+model User {
+  user_id       Int    @id @default(autoincrement())
+  username      String    @unique
+  password      String
+
+  transactions  Transaction[]
+  reviews       Review[]
+  library       Library[]
+  
+  @@map("users")
+}
+
+model Game {
+  game_id   Int  @id @default(autoincrement())
+  name      String  @unique
+  genre     String
+  price     Decimal @db.Decimal(10,2)
+  opinion   String
+  ranking   Int
+  shop_id   Int
+
+  shop            Shop    @relation(fields: [shop_id], references: [shop_id], onDelete: Cascade)
+  reviews         Review[]
+  transactions    Transaction[]
+  libraries       Library[]
+  @@map("games")
+}
+
+model Library {
+  user_id     Int
+  game_id     Int
+  favourites  Boolean @default(false)
+
+  user        User    @relation(fields: [user_id], references: [user_id])
+  game        Game    @relation(fields: [game_id], references: [game_id])
+
+  @@id([user_id, game_id])
+  @@map("libraries")
+}
+
+model Review {
+  review_id   Int  @id @default(autoincrement())
+  rating      Int
+  review_text String
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  user_id     Int
+  game_id     Int
+
+  user        User     @relation(fields: [user_id], references: [user_id])
+  game        Game     @relation(fields: [game_id], references: [game_id])
+  @@map("reviews")
+}
+
+model Transaction {
+  transaction_id  Int  @id @default(autoincrement())
+  amount          Decimal @db.Decimal(10,2)
+  currency        String @default("PLN")
+  status          String
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+  completed_at    DateTime? @db.Timestamp(6)
+  user_id         Int
+  game_id         Int
+
+  user            User  @relation(fields: [user_id], references: [user_id])
+  game            Game  @relation(fields: [game_id], references: [game_id])
+
+  @@map("transactions")
+}
