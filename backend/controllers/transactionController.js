@@ -41,8 +41,7 @@ exports.createTransaction = async (req, res) => {
         if (!Number.isInteger(userId) || !Number.isInteger(gameId)) {
             return res.status(400).json({ error: 'User ID and Game ID are required.' });
         }
-
-        // Check if the game is already in user's library
+        
         const owned = await prisma.transaction.findFirst({
             where: { user_id: userId, game_id: gameId }
         });
@@ -113,24 +112,25 @@ exports.completeTransaction = async (req, res) => {
             return res.status(409).json({ error: 'Transaction already completed.' });
         }
 
-        // Complete transaction and add to library atomically
-        const result = await prisma.transaction.update({
-                where: { transaction_id: trId },
-                data: { 
-                    status: 'COMPLETED', 
-                    completed_at: new Date() 
-                },
-                select: { transaction_id: true, status: true, completed_at: true }
-            });
+        const result = await prisma.$transaction(async (tx) => {
+            const transaction = await tx.transaction.update({
+                    where: { transaction_id: trId },
+                    data: { 
+                        status: 'COMPLETED', 
+                        completed_at: new Date() 
+                    },
+                    select: { transaction_id: true, status: true, completed_at: true, user_id: true, game_id: true }
+                });
 
-        const libraryEntry = await prisma.library.create({
-                data: { user_id: transaction.user_id, game_id: transaction.game_id, favourites: false },
-                select: { user_id: true, game_id: true }
-            });
+            const libraryEntry = await tx.library.create({
+                    data: { user_id: transaction.user_id, game_id: transaction.game_id, favourites: false },
+                    select: { user_id: true, game_id: true }
+                });
 
-        return res.status(200).json({
-            transaction: result
+            return { transaction, libraryEntry };
         });
+
+        return res.status(200).json(result.transaction);
 
     } catch (err) {
         return res.status(500).json({ error: `Failed to complete transaction: ${err.message}` });

@@ -54,24 +54,46 @@ exports.createReview = async (req, res) => {
         if (existing) {
             return res.status(409).json({ error: 'User already reviewed this game.' });
         }
-
-        const newReview = await prisma.review.create({
-            data: { rating, review_text, user_id, game_id },
-            select: {
-                review_id: true,
-                rating: true,
-                review_text: true,
-                created_at: true,
-                game_id: true,
-                user: {
-                    select: {
-                        user_id: true,
-                        username: true,
+            
+        const result = await prisma.$transaction(async (tx) => {
+            const created = await tx.review.create({
+                data: { rating, review_text, user_id, game_id },
+                select: {
+                    review_id: true,
+                    rating: true,
+                    review_text: true,
+                    created_at: true,
+                    game_id: true,
+                    user: {
+                        select: {
+                            user_id: true,
+                            username: true,
+                        }
                     }
                 }
-            }
-        })
-        return res.status(201).json(newReview);
+            });
+
+            const agg = await tx.review.aggregate({
+                where: { game_id },
+                _avg: { rating: true }
+            });
+            // agg:
+            // {
+            //     _avg: {
+            //         rating: number | null
+            //     }
+            // }
+            const avg = agg._avg.rating ?? 0;
+
+            await tx.game.update({
+                where: { game_id },
+                data: { rate: avg }
+            });
+
+            return created;
+        });
+
+        return res.status(201).json(result);
 
     } catch (err) {
         return res.status(500).json({ error: `Failed to create review: ${err.message}` });

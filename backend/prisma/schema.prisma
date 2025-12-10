@@ -38,8 +38,8 @@ model Game {
   name      String  @unique
   genre     String
   price     Decimal @db.Decimal(10,2)
-  opinion   String
-  ranking   Int
+  description   String
+  rate      Decimal @db.Decimal(10,2) @default(0.0)
   shop_id   Int
 
   shop            Shop    @relation(fields: [shop_id], references: [shop_id], onDelete: Cascade)
