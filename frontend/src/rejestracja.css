@@ -1,0 +1,111 @@
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0f2d, #1a3cff, #0d1836);
+  background-size: 400% 400%;
+}
+
+
+.top-bar {
+  display: flex;
+  justify-content: center;      
+  align-items: center;
+  gap: 40px;                  
+  margin-bottom: 20px;
+}
+
+.top-bar h1 {
+   font-family: sans-serif;
+   font-size: large;
+
+   color: cyan;
+  font-size: 3rem;
+  font-weight: 500;
+}
+
+.logo {
+  height: 150px;
+  width: auto;
+  padding: 0;
+  margin: 0;
+  transition: transform .2s;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.input p {  
+    
+  color: white;
+  font-size: 1.4rem;
+  margin-bottom: 5px;
+  
+}
+
+input {
+  display: block;
+  margin: 0 auto 40px auto;
+  outline: none !important;
+  background-color: transparent !important;
+  border: 2px solid cyan !important;     
+  border-radius:  8px;
+
+   width: 20% !important;
+  height: 20% !important;
+
+
+  color: white;
+  font-size: 18px;
+  padding: 10px 14px;
+
+  outline: none;
+   z-index: 10; 
+}
+
+.input {
+  text-align: center;
+}
+
+input:focus {
+  border-color: cyan;
+  box-shadow: 0 0 12px rgba(0,255,255,0.7);
+}
+
+button {
+  margin-top: 20px;
+  padding: 12px 26px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #1a3cff;
+  color: white;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #4f66ff;
+}
+
+
+/*  h1 -> h1
+    h1 class="xd" -> .xd
+    h1 id="xd" -> #xd 
+*/
+
+.buttonak {
+  position: fixed;
+  bottom: 15px;
+  left: 691px;
+  width: 10%;
+  padding: 2px 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #1a3cff;
+  color: white;
+}
