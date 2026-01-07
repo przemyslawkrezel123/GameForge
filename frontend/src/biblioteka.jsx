@@ -6,6 +6,7 @@ import './gra'
 import {fetchGames} from './api/gry';
 import { useNavigate } from "react-router-dom"
 import {useState, useEffect} from 'react';
+import axios from 'axios';
 
 
 const Biblioteka = () =>{
@@ -14,7 +15,19 @@ const Biblioteka = () =>{
 
     const [games, setGames] = useState([]);
     const [selectedGame, setSelectedGame] = useState(null);
-  
+    
+    const handleLogout = async () => {
+        try {
+            const response = await axios.post('http://localhost:3000/auth/logout');
+
+            console.log("Logged out:", response.data);
+            navigate("/logowanie");
+        } catch (error) {
+            console.error("Logout failed:", error);
+            alert("Błąd logowania: " + (error.response?.data?.message || error.message));
+        }
+    }
+
     useEffect(() => {
       const loadGames = async() => {
               try {
@@ -31,8 +44,8 @@ const Biblioteka = () =>{
     return (
       <>
           <div>
-              <button className="buttonek" onClick={() => navigate('/logowanie')}>
-                  Sing out
+              <button className="buttonek" onClick={() => handleLogout()}>
+                  Sign out
               </button>
               <button onClick={() => navigate('/biblioteka')}>
                   Library
