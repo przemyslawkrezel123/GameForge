@@ -2,8 +2,35 @@ import logo from './assets/logo2.png'
 import './logowanie.css'
 import { useNavigate } from "react-router-dom"
 import { LinearGradient as Lg } from 'react-text-gradients'
+import { useState } from 'react';
+import axios from 'axios';
+
 const Logowanie = () =>{
   const navigate = useNavigate()
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/auth/login', 
+      {
+        username,
+        password
+      },
+      { 
+        withCredentials: true 
+      }
+    );
+
+      if (response.status === 200) {
+        console.log("Logged in:", response.data);
+        navigate("/biblioteka");
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Błąd logowania: " + (error.response?.data?.message || error.message));
+    }
+  };
 
   return (
     <>
@@ -14,13 +41,21 @@ const Logowanie = () =>{
       </div>
       <div className='input'>
         <p>Username: </p>
-        <input type="text" />
+        <input 
+          type="text" 
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
       </div>
       <div className='input'>
         <p>Password: </p>
-        <input type="password" />
+        <input 
+          type="password" 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
       </div>
-      <button onClick={() => navigate("/biblioteka")}>
+      <button onClick={handleLogin}>
         -Sign in-
       </button>
       <button className="buttonak" onClick={() => navigate("/rejestracja")}>
