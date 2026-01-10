@@ -9,6 +9,15 @@ import {useState, useEffect} from 'react';
 import axios from "axios";
 const API_URL= 'https://localhost:7140';
 
+const ProtectedRoute = ({ children }) => {
+  const userId = localStorage.getItem('user_id');
+  
+  if (!userId) {
+    return <Navigate to="/logowanie" replace />;
+  }
+
+  return children;
+};
 
 function App() {
   
@@ -17,11 +26,23 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<Rejestracja />} />
-        <Route path="/logowanie" element={<Logowanie />} />
-        <Route path="/biblioteka" element={<Biblioteka />} />
-        <Route path="/sklep" element={<Sklep />} />
-        <Route path="/gra" element={<Gra />} />
+        <Route path="/" element={<Logowanie />} />
+        <Route path="/rejestracja" element={<Rejestracja />} />
+        <Route path="/biblioteka" element={
+          <ProtectedRoute>
+            <Biblioteka />
+          </ProtectedRoute>
+        } />
+        <Route path="/sklep" element={
+          <ProtectedRoute>
+            <Sklep />
+          </ProtectedRoute>
+        } />
+        <Route path="/gra" element={
+          <ProtectedRoute>
+            <Gra />
+          </ProtectedRoute>
+        } />
         
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
