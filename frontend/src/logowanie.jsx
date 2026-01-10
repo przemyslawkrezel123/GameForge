@@ -24,6 +24,7 @@ const Logowanie = () =>{
 
       if (response.status === 200) {
         console.log("Logged in:", response.data);
+        localStorage.setItem('user_id', response.data.userId);
         navigate("/biblioteka");
       }
     } catch (error) {

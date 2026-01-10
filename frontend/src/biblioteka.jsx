@@ -18,9 +18,10 @@ const Biblioteka = () =>{
     
     const handleLogout = async () => {
         try {
-            const response = await axios.post('http://localhost:3000/auth/logout');
+            const response = await axios.post('http://localhost:3000/auth/logout', {}, { withCredentials: true });
 
             console.log("Logged out:", response.data);
+            localStorage.removeItem('user_id');
             navigate("/logowanie");
         } catch (error) {
             console.error("Logout failed:", error);
