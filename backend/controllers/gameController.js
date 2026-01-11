@@ -12,6 +12,7 @@ exports.getAllGames = async (req, res) => {
                 genre: true,
                 price: true,
                 description: true,
+                rate: true,
                 shop_id: true,
                 libraries: user_id ? {
                     where: { user_id: Number(user_id) },
@@ -26,6 +27,7 @@ exports.getAllGames = async (req, res) => {
             genre: g.genre,
             price: g.price,
             description: g.description,
+            rate: g.rate,
             shop_id: g.shop_id,
             availability: g.libraries && g.libraries.length > 0 ? 'BOUGHT' : 'AVAILABLE'
         }));

@@ -34,25 +34,25 @@ exports.createReview = async (req, res) => {
         const { rating, review_text, user_id, game_id } = req.body;
         
         if (!rating) {
-            return res.status(400).json({ error: 'Rating is required.' });
+            return res.status(400).json({ message: 'Rating is required.' });
         }
         if (rating < 0 || rating > 10) {
-            return res.status(400).json({ error: 'Rating must be between 0 and 10.' });
+            return res.status(400).json({ message: 'Rating must be between 0 and 10.' });
         }
 
         if (!review_text || review_text.trim() === '') {
-            return res.status(400).json({ error: 'Review text cannot be empty.' });
+            return res.status(400).json({ message: 'Review text cannot be empty.' });
         }
 
         if (!user_id || !game_id) {
-            return res.status(400).json({ error: 'User ID and Game ID are required.' });
+            return res.status(400).json({ message: 'User ID and Game ID are required.' });
         }
 
         const existing = await prisma.review.findFirst({
             where: { user_id, game_id }
         });
         if (existing) {
-            return res.status(409).json({ error: 'User already reviewed this game.' });
+            return res.status(409).json({ message: 'User already reviewed this game.' });
         }
             
         const result = await prisma.$transaction(async (tx) => {
@@ -96,6 +96,6 @@ exports.createReview = async (req, res) => {
         return res.status(201).json(result);
 
     } catch (err) {
-        return res.status(500).json({ error: `Failed to create review: ${err.message}` });
+        return res.status(500).json({ message: `Failed to create review: ${err.message}` });
     }
 }
