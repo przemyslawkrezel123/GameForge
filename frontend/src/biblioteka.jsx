@@ -7,6 +7,7 @@ import {fetchGames} from './api/gry';
 import { useNavigate } from "react-router-dom"
 import {useState, useEffect} from 'react';
 import axios from 'axios';
+import ReviewForm from './ReviewForm';
 
 
 const Biblioteka = () =>{
@@ -15,7 +16,28 @@ const Biblioteka = () =>{
 
     const [games, setGames] = useState([]);
     const [selectedGame, setSelectedGame] = useState(null);
-    
+    const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+
+    useEffect(() => {
+        const loadGames = async() => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:3000/libraries/${localStorage.getItem('user_id')}`, 
+                    { withCredentials: true }
+                );
+                console.log(response)
+                setGames(response.data.map(item => ({
+                    ...item.game,
+                    id: item.game.game_id,
+                })));
+            } catch (error) {
+                console.error("Error fetching games:", error);
+            }
+        }
+        loadGames();
+  
+    }, []);
+
     const handleLogout = async () => {
         try {
             const response = await axios.post('http://localhost:3000/auth/logout', {}, { withCredentials: true });
@@ -29,18 +51,45 @@ const Biblioteka = () =>{
         }
     }
 
-    useEffect(() => {
-      const loadGames = async() => {
-              try {
-                  const data = await fetchGames();
-                  setGames(data);
-              } catch (error) {
-                  console.error("Error fetching games:", error);
-              }
-          }
-          loadGames();
-  
-      }, []);
+    const addToFavouritesHandle = async () => {
+        try {
+            await axios.put(
+                `http://localhost:3000/libraries/${localStorage.getItem('user_id')}/games/${selectedGame.id}/favourite`,
+                {}, 
+                { withCredentials: true }
+            );
+
+            const updatedFavStatus = !selectedGame.favourites;
+            
+            setSelectedGame(prev => ({ ...prev, favourites: updatedFavStatus }));
+
+            setGames(prevGames => prevGames.map(g => 
+                g.id === selectedGame.id 
+                    ? { ...g, favourites: updatedFavStatus } 
+                    : g
+            ));
+        } catch (error) {
+            console.error("Error adding to favourites:", error);
+            alert("Błąd podczas dodawania do ulubionych: " + (error.response?.data?.message || error.message));
+        }
+    }
+
+    const handleReviewSubmit = async ({ rating, reviewText }) => {
+        try {
+            await axios.post('http://localhost:3000/reviews', {
+                rating: parseInt(rating),
+                review_text: reviewText,
+                game_id: selectedGame.id,
+                user_id: parseInt(localStorage.getItem('user_id'))
+            }, { withCredentials: true });
+
+            alert("Recenzja dodana pomyślnie!");
+            setIsReviewFormOpen(false);
+        } catch (error) {
+            console.error("Error submitting review:", error);
+            alert("Błąd dodawania recenzji: " + (error.response?.data?.message || error.message));
+        }
+    }
   
     return (
       <>
@@ -80,15 +129,22 @@ const Biblioteka = () =>{
                         <h1>{selectedGame.name}</h1>
                         <p>Genre: {selectedGame.genre}</p>
                         <p>Price: {selectedGame.price}</p>
-                        <p>Opinion: {selectedGame.opinion}</p>
-                        <p>Rank: {selectedGame.rank}</p>
+                        <p>Rate: {selectedGame.rate}</p>
                         
-                        <button  onClick={() => navigate('/biblioteka')}>
-                            Add to favourites
+                        <button  onClick={() => addToFavouritesHandle()}>
+                            {selectedGame.favourites ? "Remove from favourites" : "Add to favourites"}
                         </button>
-                        <button className="buttonek2" nClick={() => navigate('/biblioteka')}>
+                        
+                        <button className="buttonek2" onClick={() => setIsReviewFormOpen(true)}>
                             Write a review
-                         </button>
+                        </button>
+
+                        {isReviewFormOpen && (
+                            <ReviewForm 
+                                onSubmit={handleReviewSubmit}
+                                onCancel={() => setIsReviewFormOpen(false)}
+                            />
+                        )}
                         </div>
                     </div>
                     )}
