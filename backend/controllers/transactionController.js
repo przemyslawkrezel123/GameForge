@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 exports.getTransactionsByUser = async (req, res) => {
     try {
-        const { user_id } = req.query;
+        const { user_id } = req.params;
 
         if (!user_id) {
             return res.status(400).json({ error: 'User ID is required.' });
@@ -93,7 +93,7 @@ exports.createTransaction = async (req, res) => {
 
 exports.completeTransaction = async (req, res) => {
     try {
-        const { transaction_id } = req.body;
+        const { transaction_id } = req.params;
         const trId = Number(transaction_id);
 
         if (!Number.isInteger(trId) || trId <= 0) {
@@ -135,4 +135,38 @@ exports.completeTransaction = async (req, res) => {
     } catch (err) {
         return res.status(500).json({ error: `Failed to complete transaction: ${err.message}` });
     }
+}
+
+exports.cancelTransaction = async (req, res) => {
+    const { transaction_id } = req.params;
+    const trId = Number(transaction_id);
+
+    if (!Number.isInteger(trId) || trId <= 0) {
+        return res.status(400).json({ error: 'Valid transaction_id is required.' });
+    }
+
+    try {
+        const transaction = await prisma.transaction.findUnique({
+            where: { transaction_id: trId },
+            select: { transaction_id: true, status: true }
+        });
+        
+        if (!transaction) {
+            return res.status(404).json({ error: 'Transaction not found.' });
+        }
+        
+        if (transaction.status === 'COMPLETED') {
+            return res.status(409).json({ error: 'Completed transaction cannot be cancelled.' });
+        }
+        
+        await prisma.transaction.delete({
+            where: { transaction_id: trId }
+        });
+        
+        return res.status(200).json({ message: 'Transaction cancelled successfully.' });
+    
+    } catch (err) {
+        return res.status(500).json({ error: `Failed to cancel transaction: ${err.message}` });
+    }
+
 }
