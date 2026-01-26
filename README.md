@@ -11,6 +11,18 @@ Poniższa instrukcja pozwoli uruchomić pełne środowisko deweloperskie (Fronte
 Otwórz terminal i sklonuj projekt na swój komputer:
 
 ```bash
-git clone [https://github.com/przemyslawkrezel123/GameForge.git](https://github.com/przemyslawkrezel123/GameForge.git)
-cd GameForge
+git clone https://github.com/przemyslawkrezel123/GameForge.git
+```
+
+**1. Przejdź do katalogu repozytorium**
+
+```bash
+cd GameForge 
+```
+
+**3. Uruchomienie aplikacji**
+Otwórz terminal i plik docker-compose.yml:
+
+```bash
 docker compose up
+```
