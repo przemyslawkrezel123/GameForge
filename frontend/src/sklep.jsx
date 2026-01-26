@@ -94,6 +94,7 @@ const Sklep = () =>{
     const handleLoadReviews = async () => {
         if (!selectedGame) return;
         
+        setShowTopGames(false);
         setLoading(true);
         try {
             const response = await axios.get(
@@ -129,6 +130,7 @@ const Sklep = () =>{
     };
 
     const loadTopGames = async () => {
+    setShowReviews(false);
     try {
       const response = await axios.get(
         'http://localhost:3000/games?limit=10&sort=rate',   
