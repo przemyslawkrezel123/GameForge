@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres-gameforge-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: gameforge_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_gameforge_data_docker:/var/lib/postgresql/data
+    networks:
+      - pg-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-gameforge-ui
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - pg-network
+
+  backend:
+    image: node:22
+    container_name: gameforge-backend
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && npx prisma generate && npx prisma migrate dev --name init && npx prisma db seed && npm run dev"
+    environment:
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/gameforge_db?schema=public
+      NODE_ENV: development
+    depends_on:
+      - postgres
+    networks:
+      - pg-network
+
+  frontend:
+    image: node:22
+    container_name: gameforge-frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host"
+    environment:
+      NODE_ENV: development
+    depends_on:
+      - backend
+    networks:
+      - pg-network
+
+volumes:
+  postgres_gameforge_data_docker:
+
+networks:
+  pg-network:
+    driver: bridge
