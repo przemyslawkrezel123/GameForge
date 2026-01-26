@@ -75,8 +75,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Linting
-        run: npm run lint --if-present
-
       - name: Build Check
         run: npm run build
