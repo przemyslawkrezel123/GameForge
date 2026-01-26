@@ -66,10 +66,10 @@ const Sklep = () =>{
                 },
                 { withCredentials: true }
             )
-            alert("Game purchased successfully!");
+            alert("Game added to basket!");
         } catch (error) {
             console.error("Error buying game:", error);
-            alert("Failed to buy game. Please try again.");
+            alert("Failed to add game to basket. Please try again.");
         }
     }
 
@@ -82,11 +82,11 @@ const Sklep = () =>{
                 user_id: parseInt(localStorage.getItem('user_id'))
             }, { withCredentials: true });
 
-            alert("Recenzja dodana pomyślnie!");
+            alert("Review added successfully!");
             setIsReviewFormOpen(false);
         } catch (error) {
             console.error("Error submitting review:", error);
-            alert("Błąd dodawania recenzji: " + (error.response?.data?.message || error.message));
+            alert("Failed to add review: " + (error.response?.data?.message || error.message));
         }
     }
     
@@ -110,7 +110,7 @@ const Sklep = () =>{
                 setReviews([]);
                 setShowReviews(true);
             } else {
-                alert("Błąd ładowania recenzji: " + (err.response?.data?.message || err.message));
+                alert("Failed to load reviews: " + (err.response?.data?.message || err.message));
             }
         } finally {
             setLoading(false);
@@ -211,7 +211,7 @@ const Sklep = () =>{
                         <p>Price: {selectedGame.price} $</p>
                         <p>Rate: {selectedGame.rate}</p>
                         <button onClick={buyGame}>
-                           Buy game
+                           Add to basket
                         </button>
 
                         <button className="buttonek5" onClick={loadTopGames}> Top 10 games </button>
