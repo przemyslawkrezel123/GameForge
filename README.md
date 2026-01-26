@@ -14,7 +14,7 @@ Otwórz terminal i sklonuj projekt na swój komputer:
 git clone https://github.com/przemyslawkrezel123/GameForge.git
 ```
 
-**1. Przejdź do katalogu repozytorium**
+**2. Przejdź do katalogu repozytorium**
 
 ```bash
 cd GameForge 
